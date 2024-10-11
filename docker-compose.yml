@@ -1,0 +1,39 @@
+version: '3.8'  # ใช้เวอร์ชันที่ใหม่กว่า
+
+services:
+  express:
+    build:
+      context: ./express
+    networks:
+      - chaiyapat-network
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/mydatabase
+    depends_on:
+      - mongodb  # ทำให้ express รอ mongodb ก่อนที่จะเริ่ม
+
+  nginx:
+    image: nginx
+    networks:
+      - chaiyapat-network
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # ตรวจสอบพาธให้ถูกต้อง
+
+  mongodb:
+    image: mongo
+    networks:
+      - chaiyapat-network
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+
+networks:
+  chaiyapat-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
